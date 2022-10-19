@@ -1,11 +1,11 @@
 [package]
-name = "runtime-macros-derive"
+name = "sylvia-runtime-macros"
 version = "0.6.0"
 authors = ["Tony Finn <git@tonyfinn.com>", "Jeremy Davis <jeremydavis519@gmail.com>", "Bartlomiej Kuras <bart.k@confio.gmbh>"]
 license = "MIT OR Apache-2.0"
 description = "Simulate expansion of procedural macros at run time"
 keywords = ["macro", "code-coverage", "proc_macro", "testing"]
-repository = "https://github.com/tonyfinn/runtime-macros-derive"
+repository = "https://github.com/CosmWasm/runtime-macros-derive"
 categories = ["development-tools"]
 readme = "README.md"
 include = ["/Cargo.toml", "/src/**/*.rs", "/README.md", "/LICENSE-APACHE", "/LICENSE-MIT"]

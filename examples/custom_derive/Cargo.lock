@@ -8,7 +8,7 @@ version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
- "runtime-macros-derive",
+ "sylvia-runtime-macros",
  "syn",
 ]
 
@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "runtime-macros-derive"
+name = "sylvia-runtime-macros"
 version = "0.6.0"
 dependencies = [
  "proc-macro2",

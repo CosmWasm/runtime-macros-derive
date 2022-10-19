@@ -13,5 +13,5 @@ quote = "1.0.2"
 syn = { version = "1.0.100", features = ["derive", "parsing", "printing", "full"] }
 
 [dev-dependencies]
-runtime-macros-derive = { path = "../.." }
+sylvia-runtime-macros = { path = "../.." }
 
