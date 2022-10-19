@@ -11,10 +11,6 @@ readme = "README.md"
 include = ["/Cargo.toml", "/src/**/*.rs", "/README.md", "/LICENSE-APACHE", "/LICENSE-MIT"]
 edition = "2018"
 
-[badges]
-travis-ci = { repository = "tonyfinn/runtime-macros", branch = "master" }
-coveralls = { repository = "tonyfinn/runtime-macros", branch = "master", service = "github" }
-
 [lib]
 crate-type = ["lib"]
 
@@ -24,4 +20,4 @@ syn = { version = "1.0.100", default-features = false, features = ["derive", "pa
 quote = "1.0.21"
 
 [dev-dependencies]
-cargo-tarpaulin = "0.21.0"
+cargo-tarpaulin = "0.22.0"
