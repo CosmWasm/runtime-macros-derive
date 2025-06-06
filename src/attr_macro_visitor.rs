@@ -45,9 +45,9 @@ impl<F> AttributeMacroVisitor<F> {
     {
         attrs
             .iter()
-            .filter(|attr| attr.path == self.macro_path)
+            .filter(|attr| attr.path() == &self.macro_path)
             .for_each(|attr| {
-                let attr: MacroAttrs = syn::parse2(attr.tokens.clone()).unwrap();
+                let attr: MacroAttrs = attr.parse_args().unwrap();
 
                 (*self.macro_fn)(attr.tokens, item.to_token_stream());
             })
@@ -91,11 +91,6 @@ where
     fn visit_item_macro(&mut self, i: &'ast syn::ItemMacro) {
         self.expand_item(&i.attrs, i);
         syn::visit::visit_item_macro(self, i);
-    }
-
-    fn visit_item_macro2(&mut self, i: &'ast syn::ItemMacro2) {
-        self.expand_item(&i.attrs, i);
-        syn::visit::visit_item_macro2(self, i);
     }
 
     fn visit_item_mod(&mut self, i: &'ast syn::ItemMod) {

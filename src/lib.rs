@@ -35,6 +35,8 @@ use std::io::Read;
 use std::panic::{self, AssertUnwindSafe};
 
 use attr_macro_visitor::AttributeMacroVisitor;
+use syn::punctuated::Punctuated;
+use syn::{Path, Token};
 
 mod attr_macro_visitor;
 
@@ -109,11 +111,11 @@ where
 
     let mut content = String::new();
     file.read_to_string(&mut content)
-        .map_err(|e| Error::IoError(e))?;
+        .map_err(Error::IoError)?;
 
     let ast =
-        AssertUnwindSafe(syn::parse_file(content.as_str()).map_err(|e| Error::ParseError(e))?);
-    let macro_path: syn::Path = syn::parse_str(macro_path).map_err(|e| Error::ParseError(e))?;
+        AssertUnwindSafe(syn::parse_file(content.as_str()).map_err(Error::ParseError)?);
+    let macro_path: syn::Path = syn::parse_str(macro_path).map_err(Error::ParseError)?;
 
     panic::catch_unwind(|| {
         syn::visit::visit_file(
@@ -121,7 +123,7 @@ where
                 macro_path,
                 proc_macro_fn,
             },
-            &*ast,
+            &ast,
         );
     })
     .map_err(|_| {
@@ -136,12 +138,14 @@ where
 
 fn uses_derive(attrs: &[syn::Attribute], derive_name: &syn::Path) -> Result<bool, Error> {
     for attr in attrs {
-        if attr.path.is_ident("derive") {
-            let meta = attr.parse_meta().map_err(|e| Error::ParseError(e))?;
-            if let syn::Meta::List(ml) = meta {
-                let uses_derive = ml.nested.iter().any(|nested_meta| {
-                    *nested_meta == syn::NestedMeta::Meta(syn::Meta::Path(derive_name.clone()))
-                });
+        if attr.path().is_ident("derive") {
+            // let meta = attr.parse_meta().map_err(|e| Error::ParseError(e))?;
+            if let syn::Meta::List(ml) = &attr.meta {
+                let nested = ml
+                    .parse_args_with(Punctuated::<Path, Token![,]>::parse_terminated)
+                    .map_err(Error::ParseError)?;
+
+                let uses_derive = nested.iter().any(|nested_meta| nested_meta == derive_name);
                 if uses_derive {
                     return Ok(true);
                 }
@@ -254,11 +258,11 @@ where
 
     let mut content = String::new();
     file.read_to_string(&mut content)
-        .map_err(|e| Error::IoError(e))?;
+        .map_err(Error::IoError)?;
 
     let ast =
-        AssertUnwindSafe(syn::parse_file(content.as_str()).map_err(|e| Error::ParseError(e))?);
-    let macro_path: syn::Path = syn::parse_str(macro_path).map_err(|e| Error::ParseError(e))?;
+        AssertUnwindSafe(syn::parse_file(content.as_str()).map_err(Error::ParseError)?);
+    let macro_path: syn::Path = syn::parse_str(macro_path).map_err(Error::ParseError)?;
 
     panic::catch_unwind(|| {
         syn::visit::visit_file(
@@ -266,7 +270,7 @@ where
                 macro_path,
                 derive_fn,
             },
-            &*ast,
+            &ast,
         );
     })
     .map_err(|_| {
@@ -351,7 +355,7 @@ where
     let macro_path: syn::Path = syn::parse_str(macro_path).map_err(Error::ParseError)?;
 
     panic::catch_unwind(|| {
-        syn::visit::visit_file(&mut AttributeMacroVisitor::new(macro_path, macro_fn), &*ast);
+        syn::visit::visit_file(&mut AttributeMacroVisitor::new(macro_path, macro_fn), &ast);
     })
     .map_err(|_| {
         Error::ParseError(syn::parse::Error::new(
@@ -417,7 +421,7 @@ mod tests {
             .unwrap()
             .join("examples")
             .join("custom_assert");
-        config.manifest = test_dir.join("Cargo.toml");
+        config.set_manifest(test_dir.join("Cargo.toml"));
         config.test_timeout = time::Duration::from_secs(60);
         let (_trace_map, return_code) = launch_tarpaulin(&config, &None).unwrap();
         assert_eq!(return_code, 0);
@@ -430,9 +434,27 @@ mod tests {
             .unwrap()
             .join("examples")
             .join("custom_derive");
-        config.manifest = test_dir.join("Cargo.toml");
+        config.set_manifest(test_dir.join("Cargo.toml"));
         config.test_timeout = time::Duration::from_secs(60);
         let (_trace_map, return_code) = launch_tarpaulin(&config, &None).unwrap();
+        assert_eq!(return_code, 0);
+    }
+    #[test]
+
+    fn attribute_macro_coverage() {
+        let mut config = Config::default();
+
+        let test_dir = env::current_dir()
+            .unwrap()
+            .join("examples")
+            .join("custom_attribute");
+
+        config.set_manifest(test_dir.join("Cargo.toml"));
+
+        config.test_timeout = time::Duration::from_secs(60);
+
+        let (_trace_map, return_code) = launch_tarpaulin(&config, &None).unwrap();
+
         assert_eq!(return_code, 0);
     }
 }

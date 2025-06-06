@@ -1,23 +1,41 @@
 [package]
 name = "sylvia-runtime-macros"
 version = "0.6.0"
-authors = ["Tony Finn <git@tonyfinn.com>", "Jeremy Davis <jeremydavis519@gmail.com>", "Bartlomiej Kuras <bart.k@confio.gmbh>"]
+authors = [
+    "Tony Finn <git@tonyfinn.com>",
+    "Jeremy Davis <jeremydavis519@gmail.com>",
+    "Bartlomiej Kuras <bart.k@confio.gmbh>",
+]
 license = "MIT OR Apache-2.0"
 description = "Simulate expansion of procedural macros at run time"
 keywords = ["macro", "code-coverage", "proc_macro", "testing"]
 repository = "https://github.com/CosmWasm/runtime-macros-derive"
 categories = ["development-tools"]
 readme = "README.md"
-include = ["/Cargo.toml", "/src/**/*.rs", "/README.md", "/LICENSE-APACHE", "/LICENSE-MIT"]
+include = [
+    "/Cargo.toml",
+    "/src/**/*.rs",
+    "/README.md",
+    "/LICENSE-APACHE",
+    "/LICENSE-MIT",
+]
 edition = "2018"
 
 [lib]
 crate-type = ["lib"]
 
 [dependencies]
-proc-macro2 = "1.0.43"
-syn = { version = "1.0.100", default-features = false, features = ["derive", "parsing", "full", "visit", "extra-traits", "printing"] }
-quote = "1.0.21"
+proc-macro2 = "1.0.95"
+syn = { version = "2.0.101", default-features = false, features = [
+    "clone-impls",
+    "derive",
+    "parsing",
+    "full",
+    "visit",
+    "extra-traits",
+    "printing",
+] }
+quote = "1.0.40"
 
 [dev-dependencies]
-cargo-tarpaulin = "0.22.0"
+cargo-tarpaulin = "0.32.7"
